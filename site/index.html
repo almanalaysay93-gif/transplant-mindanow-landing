@@ -405,10 +405,11 @@ footer b{color:var(--gold-bright);font-weight:500}
 </nav>
 
 <main id="top">
-  <!-- HERO BANNER (full-bleed) -->
+  <!-- HERO BANNER (full-bleed video) -->
   <header class="hero-banner">
-    <img class="banner-img" src="assets/banner.png"
-         alt="4th Transplant MindaNOW — Bridging the Gaps: From Referral to Recovery. July 6 and 7, 2026, Apo View Hotel, Davao City.">
+    <video class="banner-img" src="assets/banner.mp4" poster="assets/banner.png"
+           autoplay loop muted playsinline preload="auto"
+           aria-label="4th Transplant MindaNOW — Bridging the Gaps: From Referral to Recovery. July 6 and 7, 2026, Apo View Hotel, Davao City."></video>
   </header>
 
   <!-- TEXT HERO (below banner) -->
@@ -642,7 +643,7 @@ onScroll();
 
 /* ---- robust autoplay nudge for the hero video ---- */
 (() => {
-  const v = document.querySelector(".orn-frame video");
+  const v = document.querySelector(".hero-banner video");
   if(!v) return;
   const kick = () => { v.muted = true; const p = v.play(); if(p && p.catch) p.catch(()=>{}); };
   kick();
