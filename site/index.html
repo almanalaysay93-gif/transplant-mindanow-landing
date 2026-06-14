@@ -551,6 +551,7 @@ h2 em{font-style:italic;color:var(--gold-bright)}
   background:var(--gold-grad);background-size:200% 100%;transition:transform .3s,background-position .6s}
 .bot-form button:hover{transform:scale(1.07);background-position:100% 0}
 .bot-form button svg{width:18px;height:18px}
+.bot-panel.kb .bot-chips{display:none}   /* free vertical room while the keyboard is up */
 @media(max-width:560px){
   .bot-panel{right:.6rem;left:.6rem;width:auto;bottom:82px;height:min(72dvh,540px)}
   .bot-fab{width:56px;height:56px;right:.9rem;bottom:.9rem}
@@ -1039,6 +1040,26 @@ form.addEventListener("submit", async ev => {
   };
   fab.addEventListener("click", () => toggle(!panel.classList.contains("open")));
   document.addEventListener("keydown", e => { if(e.key === "Escape" && panel.classList.contains("open")) toggle(false); });
+
+  /* keep the input visible above the on-screen keyboard (mobile) */
+  const vv = window.visualViewport;
+  const kbAdjust = () => {
+    if(!vv) return;
+    const inset = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
+    const up = inset > 60 && panel.classList.contains("open");
+    panel.classList.toggle("kb", up);
+    if(up){
+      panel.style.bottom = (inset + 10) + "px";
+      panel.style.maxHeight = (vv.height - 20) + "px";
+      log.scrollTop = log.scrollHeight;
+    } else {
+      panel.style.bottom = "";
+      panel.style.maxHeight = "";
+    }
+  };
+  if(vv){ vv.addEventListener("resize", kbAdjust); vv.addEventListener("scroll", kbAdjust); }
+  botInput.addEventListener("focus", () => setTimeout(kbAdjust, 250));
+  botInput.addEventListener("blur", () => setTimeout(kbAdjust, 100));
 
   botForm.addEventListener("submit", e => {
     e.preventDefault();
