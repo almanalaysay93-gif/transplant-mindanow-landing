@@ -462,6 +462,99 @@ h2 em{font-style:italic;color:var(--gold-bright)}
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.2s!important}
 }
+
+/* ====== Q&A chatbot ====== */
+.bot-fab{
+  position:fixed;right:clamp(1rem,3vw,1.8rem);bottom:clamp(1rem,3vw,1.8rem);z-index:80;
+  width:62px;height:62px;border-radius:50%;border:none;cursor:pointer;
+  display:grid;place-items:center;color:var(--navy-deep);
+  background:var(--gold-grad);background-size:220% 100%;
+  box-shadow:0 10px 34px rgba(201,162,59,.4);
+  transition:transform .35s cubic-bezier(.2,.8,.2,1),border-radius .5s ease,background-position .6s ease;
+  animation:sealMorph 9s ease-in-out infinite;
+}
+.bot-fab::after{                                  /* soft pulse ring to invite the first click */
+  content:"";position:absolute;inset:0;border-radius:inherit;
+  box-shadow:0 0 0 0 rgba(201,162,59,.45);animation:botPulse 3.2s ease-out infinite;pointer-events:none;
+}
+@keyframes botPulse{0%{box-shadow:0 0 0 0 rgba(201,162,59,.4)}70%,100%{box-shadow:0 0 0 16px rgba(201,162,59,0)}}
+.bot-fab:hover{transform:translateY(-3px) scale(1.05);background-position:100% 0}
+.bot-fab svg{width:27px;height:27px;position:relative;z-index:1}
+.bot-fab .x{display:none}
+.bot-fab.open{animation:none}
+.bot-fab.open::after{display:none}
+.bot-fab.open .chat{display:none}
+.bot-fab.open .x{display:block}
+
+.bot-panel{
+  position:fixed;right:clamp(1rem,3vw,1.8rem);bottom:calc(clamp(1rem,3vw,1.8rem) + 78px);z-index:80;
+  width:min(384px,calc(100vw - 2rem));height:auto;max-height:min(580px,calc(100dvh - 130px));
+  padding:0;display:flex;flex-direction:column;overflow:hidden;
+  border:1px solid var(--hairline);border-radius:1.5rem;
+  background:linear-gradient(168deg,rgba(18,42,87,.94),rgba(6,15,34,.97));
+  backdrop-filter:blur(18px);box-shadow:0 30px 80px rgba(0,0,0,.6),0 0 0 1px rgba(240,210,132,.06);
+  opacity:0;transform:translateY(18px) scale(.97);pointer-events:none;transform-origin:bottom right;
+  transition:opacity .35s ease,transform .42s cubic-bezier(.2,.8,.2,1);
+}
+.bot-panel.open{opacity:1;transform:none;pointer-events:auto}
+.bot-head{
+  position:relative;display:flex;align-items:center;gap:.85rem;padding:1.05rem 1.25rem;
+  border-bottom:1px solid var(--hairline);
+  background:linear-gradient(180deg,rgba(18,42,87,.7),rgba(6,15,34,.25));
+}
+.bot-head .ring{
+  position:relative;width:42px;height:42px;border-radius:50%;flex:none;display:grid;place-items:center;
+  border:1px solid var(--gold);color:var(--gold-bright);
+  font-family:var(--serif);font-weight:600;font-size:.74rem;letter-spacing:.02em;
+  background:radial-gradient(circle at 30% 25%,rgba(201,162,59,.28),transparent 70%);
+}
+.bot-head .ring::after{                            /* online status dot */
+  content:"";position:absolute;right:-1px;bottom:-1px;width:11px;height:11px;border-radius:50%;
+  background:#5fd08a;border:2px solid var(--navy-deep);box-shadow:0 0 8px rgba(95,208,138,.7);
+}
+.bot-head .t{min-width:0;line-height:1.25}
+.bot-head .t b{display:block;color:var(--ivory);font-family:var(--serif);font-weight:500;font-size:1.02rem;letter-spacing:.005em}
+.bot-head .t span{display:block;font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:var(--gold-bright);margin-top:.18rem}
+.bot-log{flex:1 1 auto;min-height:0;overflow-y:auto;padding:1.25rem 1.2rem .55rem;display:flex;flex-direction:column;gap:.7rem;scroll-behavior:smooth}
+.bot-log::-webkit-scrollbar{width:5px}
+.bot-log::-webkit-scrollbar-thumb{background:var(--hairline);border-radius:99px}
+.bot-log::-webkit-scrollbar-track{background:transparent}
+.msg{max-width:86%;font-size:.9rem;line-height:1.62;padding:.72rem .95rem;border-radius:1.05rem;
+  animation:msgIn .42s cubic-bezier(.2,.8,.2,1) both}
+@keyframes msgIn{from{opacity:0;transform:translateY(10px) scale(.98)}to{opacity:1;transform:none}}
+.msg.bot{align-self:flex-start;background:rgba(126,160,232,.13);border:1px solid rgba(126,160,232,.2);color:var(--ivory);border-bottom-left-radius:.3rem}
+.msg.user{align-self:flex-end;background:var(--gold-grad);background-size:200% 100%;color:var(--navy-deep);font-weight:500;border-bottom-right-radius:.3rem;box-shadow:0 4px 16px rgba(201,162,59,.22)}
+.msg a{color:var(--gold-bright);font-weight:600;text-decoration:none;border-bottom:1px solid rgba(240,210,132,.4)}
+.msg.bot b{color:var(--gold-bright);font-weight:600}
+.msg.typing{display:flex;gap:.32rem;align-items:center;padding:.85rem 1rem}
+.msg.typing i{width:7px;height:7px;border-radius:50%;background:var(--blue-soft);opacity:.5;animation:botDot 1.2s ease-in-out infinite}
+.msg.typing i:nth-child(2){animation-delay:.18s}
+.msg.typing i:nth-child(3){animation-delay:.36s}
+@keyframes botDot{0%,60%,100%{opacity:.35;transform:translateY(0)}30%{opacity:1;transform:translateY(-4px)}}
+.bot-chips{display:flex;flex-wrap:wrap;gap:.45rem;padding:.7rem 1.2rem .95rem;border-top:1px solid rgba(201,162,59,.12)}
+.bot-chip{
+  cursor:pointer;border:1px solid rgba(126,160,232,.28);border-radius:99px;
+  padding:.46rem .85rem;font-size:.73rem;color:var(--ivory-dim);background:rgba(126,160,232,.06);
+  font-family:var(--sans);white-space:nowrap;transition:all .3s cubic-bezier(.2,.8,.2,1);
+}
+.bot-chip:hover{border-color:var(--gold);color:var(--navy-deep);background:var(--gold-bright);transform:translateY(-2px);box-shadow:0 5px 16px rgba(201,162,59,.28)}
+.bot-form{display:flex;gap:.55rem;padding:.85rem 1rem 1rem;border-top:1px solid var(--hairline);background:rgba(6,15,34,.45)}
+.bot-form input{
+  flex:1;min-width:0;background:rgba(6,15,34,.55);border:1px solid rgba(126,160,232,.22);
+  border-radius:99px;color:var(--ivory);font-family:var(--sans);font-size:.9rem;
+  padding:.72rem 1.15rem;outline:none;transition:border-color .3s,background .3s}
+.bot-form input::placeholder{color:rgba(244,239,226,.4)}
+.bot-form input:focus{border-color:var(--gold);background:rgba(11,27,58,.6)}
+.bot-form button{
+  flex:none;width:44px;height:44px;border-radius:50%;border:none;cursor:pointer;
+  display:grid;place-items:center;color:var(--navy-deep);
+  background:var(--gold-grad);background-size:200% 100%;transition:transform .3s,background-position .6s}
+.bot-form button:hover{transform:scale(1.07);background-position:100% 0}
+.bot-form button svg{width:18px;height:18px}
+@media(max-width:560px){
+  .bot-panel{right:.6rem;left:.6rem;width:auto;bottom:82px;height:min(72dvh,540px)}
+  .bot-fab{width:56px;height:56px;right:.9rem;bottom:.9rem}
+}
 </style>
 </head>
 <body>
@@ -695,6 +788,27 @@ h2 em{font-style:italic;color:var(--gold-bright)}
   </footer>
 </div>
 
+<!-- ===== Q&A chatbot ===== -->
+<button class="bot-fab" id="botFab" aria-label="Ask about the conference" aria-expanded="false">
+  <svg class="chat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-8.5 8.5 8.5 8.5 0 0 1-3.6-.8L3 21l1.9-5.4A8.38 8.38 0 0 1 4 12a8.5 8.5 0 0 1 8.5-8.5 8.38 8.38 0 0 1 8.5 8z"/><path d="M8.5 11h.01M12 11h.01M15.5 11h.01"/></svg>
+  <svg class="x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+</button>
+
+<section class="bot-panel" id="botPanel" aria-label="Conference assistant" role="dialog">
+  <div class="bot-head">
+    <span class="ring">TM·4</span>
+    <span class="t"><b>Conference Assistant</b><span>Online · Ask anything</span></span>
+  </div>
+  <div class="bot-log" id="botLog" aria-live="polite"></div>
+  <div class="bot-chips" id="botChips"></div>
+  <form class="bot-form" id="botForm" autocomplete="off">
+    <input type="text" id="botInput" placeholder="Ask a question…" aria-label="Type your question">
+    <button type="submit" aria-label="Send">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+    </button>
+  </form>
+</section>
+
 <script>
 /* ---- config: Google Form endpoint + field map ---- */
 const FORM_ACTION = "https://docs.google.com/forms/d/e/1FAIpQLSchBHPEyMEauEQ_aBQwquNMqiMlrHB7ZC0ABGCZ7p98ntkiAQ/formResponse";
@@ -832,6 +946,109 @@ form.addEventListener("submit", async ev => {
     formMsg.style.display = "inline";
   }
 });
+
+/* ================= Q&A chatbot ================= */
+(() => {
+  /* knowledge base — each intent: keywords (scored) + answer (HTML allowed) */
+  const KB = [
+    { k:["when","date","dates","day","days","schedule","what time","start","july"],
+      a:"The <b>4th Transplant MindaNOW Conference</b> runs <b>July 6–7, 2026</b> — a day-and-a-half program starting <b>8:00 AM</b> on July 6 (PHT)." },
+    { k:["where","venue","location","place","hotel","apo","address","davao","held"],
+      a:"It's held at the <b>Apo View Hotel</b> in the heart of <b>Davao City</b>, gathering Mindanao's transplant centers, referring hospitals, and partner institutions under one roof." },
+    { k:["register","registration","sign up","signup","rsvp","seat","reserve","attend","join","enroll","ticket"],
+      a:"You can reserve your seat with the registration form on this page. <a href='#register'>Jump to registration ↓</a>" },
+    { k:["theme","topic","about","what is","purpose","focus","goal","mission"],
+      a:"The theme is <b>“Bridging the Gaps: From Referral to Recovery.”</b> The conference strengthens every link in the chain of transplant care — from the first referral all the way to full recovery." },
+    { k:["who","attend","audience","for whom","participants","invited","should i"],
+      a:"It's for the <b>whole team</b>: physicians, nurses, transplant coordinators, allied health, and administrators — every role in referral-to-recovery has a seat." },
+    { k:["host","organizer","organize","auspices","convened","behind","run by","doh","spmc","share"],
+      a:"Convened by <b>DOH Center for Health Development XI</b>, <b>Southern Philippines Medical Center (SPMC)</b>, and <b>SHARE Organ Transplant Services Unit</b>." },
+    { k:["accommodation","hotel room","stay","sleep","lodging","room","overnight","live in","live out"],
+      a:"This is a <b>live-out event</b> — accommodation is <b>not included</b>. Please arrange your own lodging if travelling from out of town." },
+    { k:["cost","fee","price","payment","pay","free","how much","charge"],
+      a:"Registration details are handled through the form on this page. For fee specifics, please reach the organizers directly — DOH CHD XI / SPMC." },
+    { k:["food","meal","diet","dietary","allergy","allergies","vegetarian","halal","eat"],
+      a:"Meals are provided during the event. You can note <b>dietary restrictions</b> (None, Vegetarian, Halal, or Other) in the registration form." },
+    { k:["contact","email","phone","reach","question","help","inquiry","call"],
+      a:"For inquiries, the organizers are <b>DOH Center for Health Development XI</b> and <b>SPMC</b>. Submit your questions through the registration form's message field and they'll get back to you." },
+    { k:["program","agenda","sessions","plenary","workshop","speakers","activities","what happens"],
+      a:"Two days of <b>plenaries, case discussions, and workshops</b> tracing the full journey of the transplant patient — and the gaps we close together." },
+    { k:["hello","hi","hey","greetings","good morning","good day"],
+      a:"Hello! 👋 I'm the conference assistant. Ask me about <b>dates, venue, registration, who should attend</b>, or anything about the 4th Transplant MindaNOW." },
+    { k:["thanks","thank you","thankyou","salamat","appreciate"],
+      a:"You're welcome! See you in <b>Davao</b> this July. 🤝" }
+  ];
+  const FALLBACK = "I can help with the conference <b>dates, venue, registration, theme, who should attend, organizers, accommodation, and meals</b>. Try one of the quick questions below, or rephrase yours.";
+  const CHIPS = [
+    ["When is it?","when is the conference"],
+    ["Where?","where is the venue"],
+    ["Who should attend?","who should attend"],
+    ["How do I register?","how do i register"],
+    ["Accommodation?","is accommodation included"]
+  ];
+
+  const fab = document.getElementById("botFab");
+  const panel = document.getElementById("botPanel");
+  const log = document.getElementById("botLog");
+  const chipsWrap = document.getElementById("botChips");
+  const botForm = document.getElementById("botForm");
+  const botInput = document.getElementById("botInput");
+
+  const answer = q => {
+    const t = " " + q.toLowerCase().replace(/[^\w\s]/g," ") + " ";
+    let best = null, score = 0;
+    KB.forEach(item => {
+      let s = 0;
+      item.k.forEach(kw => { if(t.includes(" "+kw+" ") || t.includes(kw)) s += kw.split(" ").length; });
+      if(s > score){ score = s; best = item; }
+    });
+    return score ? best.a : FALLBACK;
+  };
+
+  const push = (text, who) => {
+    const m = document.createElement("div");
+    m.className = "msg " + who;
+    m.innerHTML = text;
+    log.appendChild(m);
+    log.scrollTop = log.scrollHeight;
+  };
+  const botReply = q => {
+    const dots = document.createElement("div");
+    dots.className = "msg bot typing";
+    dots.innerHTML = "<i></i><i></i><i></i>";
+    log.appendChild(dots); log.scrollTop = log.scrollHeight;
+    setTimeout(() => { dots.remove(); push(answer(q), "bot"); }, 620);
+  };
+
+  CHIPS.forEach(([label,query]) => {
+    const b = document.createElement("button");
+    b.type = "button"; b.className = "bot-chip"; b.textContent = label;
+    b.addEventListener("click", () => { push(label,"user"); botReply(query); });
+    chipsWrap.appendChild(b);
+  });
+
+  let greeted = false;
+  const toggle = open => {
+    fab.classList.toggle("open", open);
+    panel.classList.toggle("open", open);
+    fab.setAttribute("aria-expanded", open);
+    if(open){
+      if(!greeted){ push("Hello! 👋 I'm the conference assistant for the <b>4th Transplant MindaNOW</b>. Ask me anything about the event.","bot"); greeted = true; }
+      setTimeout(() => botInput.focus(), 350);
+    }
+  };
+  fab.addEventListener("click", () => toggle(!panel.classList.contains("open")));
+  document.addEventListener("keydown", e => { if(e.key === "Escape" && panel.classList.contains("open")) toggle(false); });
+
+  botForm.addEventListener("submit", e => {
+    e.preventDefault();
+    const q = botInput.value.trim();
+    if(!q) return;
+    push(q,"user");
+    botInput.value = "";
+    botReply(q);
+  });
+})();
 </script>
 </body>
 </html>
