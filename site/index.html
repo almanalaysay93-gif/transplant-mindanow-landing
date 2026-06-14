@@ -358,15 +358,15 @@ h2 em{font-style:italic;color:var(--gold-bright)}
 .success p b{color:var(--gold-bright);font-weight:500}
 
 /* reveal on scroll */
-.reveal{opacity:0;transform:translateY(34px);transition:opacity .9s ease,transform .9s cubic-bezier(.2,.8,.2,1)}
-.reveal.in{opacity:1;transform:none}
+.reveal{opacity:0;transform:translateY(34px);filter:blur(6px);transition:opacity .9s ease,transform .9s cubic-bezier(.2,.8,.2,1),filter .7s ease-out}
+.reveal.in{opacity:1;transform:none;filter:blur(0)}
 /* scroll-morph: cards/panel melt from an organic blob into their resting shape as they enter */
 .card.reveal:not(.in){border-radius:46% 54% 56% 44%/52% 46% 54% 48%}
 .reg-card{transition:border-radius 1s cubic-bezier(.2,.8,.2,1)}
 .reg-card.reveal:not(.in){border-radius:42% 58% 60% 40%/55% 45% 52% 48%}
 /* ===== 5-panel fade + lift transitions ===== */
-.panel{opacity:0;transform:translateY(60px);transition:opacity 1s ease,transform 1.1s cubic-bezier(.2,.8,.2,1);will-change:opacity,transform}
-.panel.in{opacity:1;transform:none}
+.panel{opacity:0;transform:translateY(28px);filter:blur(8px);transition:opacity .7s ease-out,transform .7s ease-out,filter .7s ease-out;will-change:opacity,transform,filter}
+.panel.in{opacity:1;transform:none;filter:blur(0)}
 
 /* ===== curtain-reveal footer ===== */
 /* spacer in normal flow; clip-path clips the fixed scene to this box so it
@@ -430,8 +430,8 @@ h2 em{font-style:italic;color:var(--gold-bright)}
 }
 .cine-bottom b{color:var(--gold-bright);font-weight:500}
 /* staggered reveal of the scene content */
-.cine [data-cine]{opacity:0;transform:translateY(42px);transition:opacity .9s ease,transform .9s cubic-bezier(.2,.8,.2,1)}
-.cine.in [data-cine]{opacity:1;transform:none}
+.cine [data-cine]{opacity:0;transform:translateY(42px);filter:blur(6px);transition:opacity .9s ease,transform .9s cubic-bezier(.2,.8,.2,1),filter .7s ease-out}
+.cine.in [data-cine]{opacity:1;transform:none;filter:blur(0)}
 .cine.in [data-cine="2"]{transition-delay:.1s}
 .cine.in [data-cine="3"]{transition-delay:.2s}
 .cine.in [data-cine="4"]{transition-delay:.3s}
@@ -453,6 +453,8 @@ h2 em{font-style:italic;color:var(--gold-bright)}
   .blob{filter:blur(34px)}
   .grain{opacity:.04}
   .card,.reg-card{backdrop-filter:blur(6px)}
+  .panel{filter:blur(6px)}                 /* lighter transient reveal-blur on phones */
+  .reveal,.cine [data-cine]{filter:blur(4px)}
   .cine-giant{font-size:34vw}
   /* dvh removes the mobile address-bar gap under the curtain footer */
   .curtain,.cine{height:100dvh}
