@@ -39,7 +39,7 @@ body{
 
 /* ====== ambient morphing field ====== */
 .field{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
-.blob{position:absolute;filter:blur(70px);opacity:.55;will-change:border-radius,transform}
+.blob{position:absolute;filter:blur(54px);opacity:.55;will-change:border-radius,transform}
 .blob-1{
   width:62vmax;height:62vmax;left:-18vmax;top:-24vmax;
   background:radial-gradient(circle at 35% 35%,#1E3F8F 0%,#0B1B3A 60%,transparent 75%);
@@ -143,7 +143,7 @@ nav{
 
 /* ====== flush banner header ====== */
 .hero-banner{width:100%;line-height:0;background:var(--navy-deep)}
-.banner-img{display:block;width:100%;height:auto;margin:0}
+.banner-img{display:block;width:100%;height:auto;margin:0;filter:saturate(1.04) contrast(1.02);transform:translateZ(0)}
 .hero-band{
   display:flex;align-items:center;justify-content:center;
   gap:clamp(1.6rem,5vw,3.6rem);flex-wrap:wrap;
@@ -204,17 +204,6 @@ h1 .l3{animation-delay:.6s}
 }
 .btn-gold:hover{background-position:100% 0;transform:translateY(-3px);border-radius:1.2rem 99px 1.2rem 99px;
   box-shadow:0 14px 44px rgba(201,162,59,.4)}
-.hero-orn{
-  position:absolute;right:clamp(-9rem,-1vw,2rem);top:50%;transform:translateY(-50%);
-  width:clamp(360px,46vw,720px);pointer-events:none;
-}
-@media(max-width:900px){.hero-orn{position:static;transform:none;width:min(560px,92vw);margin:3rem auto 0;display:block}}
-/* clean, frameless hero video */
-.orn-frame{
-  position:relative;width:100%;aspect-ratio:1;overflow:hidden;border-radius:.6rem;
-  box-shadow:0 40px 110px rgba(0,0,0,.55);
-}
-.orn-frame video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
 
 /* countdown */
 .count{
@@ -371,15 +360,103 @@ h2 em{font-style:italic;color:var(--gold-bright)}
 /* reveal on scroll */
 .reveal{opacity:0;transform:translateY(34px);transition:opacity .9s ease,transform .9s cubic-bezier(.2,.8,.2,1)}
 .reveal.in{opacity:1;transform:none}
+/* scroll-morph: cards/panel melt from an organic blob into their resting shape as they enter */
+.card.reveal:not(.in){border-radius:46% 54% 56% 44%/52% 46% 54% 48%}
+.reg-card{transition:border-radius 1s cubic-bezier(.2,.8,.2,1)}
+.reg-card.reveal:not(.in){border-radius:42% 58% 60% 40%/55% 45% 52% 48%}
+/* ===== 5-panel fade + lift transitions ===== */
+.panel{opacity:0;transform:translateY(60px);transition:opacity 1s ease,transform 1.1s cubic-bezier(.2,.8,.2,1);will-change:opacity,transform}
+.panel.in{opacity:1;transform:none}
 
-footer{
-  border-top:1px solid var(--hairline);
-  padding:2.6rem clamp(1.2rem,6vw,5rem);
-  display:flex;justify-content:space-between;align-items:center;gap:1.4rem;flex-wrap:wrap;
-  font-size:.74rem;letter-spacing:.22em;text-transform:uppercase;color:var(--ivory-dim);
-  background:rgba(6,15,34,.6);
+/* ===== curtain-reveal footer ===== */
+/* spacer in normal flow; clip-path clips the fixed scene to this box so it
+   is uncovered as the page scrolls up over it (the "curtain" reveal) */
+.curtain{position:relative;z-index:2;height:100vh;clip-path:polygon(0 0,100% 0,100% 100%,0 100%)}
+.cine{
+  position:fixed;bottom:0;left:0;width:100%;height:100vh;
+  display:flex;flex-direction:column;justify-content:space-between;
+  padding:0;overflow:hidden;background:var(--navy-deep);border-top:1px solid var(--hairline);
 }
-footer b{color:var(--gold-bright);font-weight:500}
+.cine-aurora{
+  position:absolute;left:50%;top:46%;width:80vw;height:60vh;transform:translate(-50%,-50%);
+  background:radial-gradient(circle at 50% 50%,rgba(43,83,184,.22),rgba(201,162,59,.12) 45%,transparent 70%);
+  filter:blur(80px);border-radius:50%;pointer-events:none;
+  animation:cineBreathe 8s ease-in-out infinite alternate;
+}
+@keyframes cineBreathe{from{transform:translate(-50%,-50%) scale(1);opacity:.6}to{transform:translate(-50%,-50%) scale(1.12);opacity:.95}}
+.cine-grid{
+  position:absolute;inset:0;pointer-events:none;opacity:.55;background-size:60px 60px;
+  background-image:linear-gradient(to right,rgba(244,239,226,.045) 1px,transparent 1px),
+                   linear-gradient(to bottom,rgba(244,239,226,.045) 1px,transparent 1px);
+  -webkit-mask-image:linear-gradient(to bottom,transparent,#000 30%,#000 70%,transparent);
+  mask-image:linear-gradient(to bottom,transparent,#000 30%,#000 70%,transparent);
+}
+.cine-giant{
+  position:absolute;left:50%;bottom:-1vh;transform:translateX(-50%);
+  font-family:var(--serif);font-weight:600;font-size:26vw;line-height:.72;letter-spacing:-.04em;
+  white-space:nowrap;pointer-events:none;user-select:none;z-index:0;will-change:transform,opacity;opacity:0;
+  color:transparent;-webkit-text-stroke:1px rgba(201,162,59,.10);
+  background:linear-gradient(180deg,rgba(201,162,59,.18),transparent 60%);
+  -webkit-background-clip:text;background-clip:text;
+}
+.cine-main{
+  position:relative;z-index:2;flex:1;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;text-align:center;gap:1.7rem;
+  padding:6rem clamp(1.2rem,6vw,5rem) 2rem;
+}
+.cine-kicker{
+  display:inline-flex;align-items:center;gap:.9rem;
+  font-size:.7rem;letter-spacing:.4em;text-transform:uppercase;color:var(--gold-bright);
+}
+.cine-kicker::before,.cine-kicker::after{content:"";height:1px;width:2.6rem;background:linear-gradient(90deg,transparent,var(--gold))}
+.cine-kicker::after{background:linear-gradient(90deg,var(--gold),transparent)}
+.cine-head{
+  font-family:var(--serif);font-weight:340;font-size:clamp(2.6rem,7vw,5.6rem);line-height:1.02;letter-spacing:-.01em;
+  background:linear-gradient(180deg,var(--ivory),rgba(244,239,226,.5));-webkit-background-clip:text;background-clip:text;color:transparent;
+  filter:drop-shadow(0 0 26px rgba(244,239,226,.10));
+}
+.cine-head em{font-style:italic;background:var(--gold-grad);background-size:240% 100%;-webkit-background-clip:text;background-clip:text;color:transparent}
+.cine-actions{display:flex;gap:1.2rem;flex-wrap:wrap;align-items:center;justify-content:center;margin-top:.6rem}
+.cine-ghost{
+  text-decoration:none;color:var(--ivory-dim);font-size:.72rem;letter-spacing:.3em;text-transform:uppercase;
+  padding:1.1rem 1.8rem;border-radius:99px;border:1px solid var(--hairline);
+  transition:color .3s,border-color .3s,transform .3s;
+}
+.cine-ghost:hover{color:var(--ivory);border-color:var(--gold);transform:translateY(-2px)}
+.cine-bottom{
+  position:relative;z-index:2;display:flex;justify-content:space-between;align-items:center;gap:1.4rem;flex-wrap:wrap;
+  padding:1.6rem clamp(1.2rem,6vw,5rem);border-top:1px solid var(--hairline);
+  font-size:.7rem;letter-spacing:.22em;text-transform:uppercase;color:var(--ivory-dim);background:rgba(6,15,34,.4);
+}
+.cine-bottom b{color:var(--gold-bright);font-weight:500}
+/* staggered reveal of the scene content */
+.cine [data-cine]{opacity:0;transform:translateY(42px);transition:opacity .9s ease,transform .9s cubic-bezier(.2,.8,.2,1)}
+.cine.in [data-cine]{opacity:1;transform:none}
+.cine.in [data-cine="2"]{transition-delay:.1s}
+.cine.in [data-cine="3"]{transition-delay:.2s}
+.cine.in [data-cine="4"]{transition-delay:.3s}
+@media(max-width:640px){.cine-bottom{flex-direction:column;text-align:center}}
+/* ===== phone optimization ===== */
+@media(max-width:560px){
+  nav{padding:.8rem 1.05rem;backdrop-filter:blur(4px)}
+  .seal{gap:.55rem}
+  .seal-ring{width:38px;height:38px;font-size:.68rem}
+  .seal-text{font-size:0}                 /* drop the long subtitle, keep the wordmark */
+  .seal-text b{font-size:.62rem;letter-spacing:.1em;white-space:nowrap}
+  .nav-cta{padding:.62rem 1.05rem;font-size:.62rem;letter-spacing:.18em}
+  .hero{padding-top:2.4rem}
+  h1{font-size:clamp(2.2rem,8.5vw,3rem)}
+  .hero-sub{margin-top:1.8rem}
+  .hero-meta{gap:1.6rem 2rem;margin-top:2.2rem}
+  section{padding:3.4rem clamp(1.2rem,6vw,5rem)}
+  /* lighter blur so scroll + video stay smooth on phone GPUs */
+  .blob{filter:blur(34px)}
+  .grain{opacity:.04}
+  .card,.reg-card{backdrop-filter:blur(6px)}
+  .cine-giant{font-size:34vw}
+  /* dvh removes the mobile address-bar gap under the curtain footer */
+  .curtain,.cine{height:100dvh}
+}
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.2s!important}
 }
@@ -405,11 +482,16 @@ footer b{color:var(--gold-bright);font-weight:500}
 </nav>
 
 <main id="top">
+  <!-- PANEL 1 · HERO -->
+  <div class="panel" data-panel="1">
   <!-- HERO BANNER (full-bleed video) -->
   <header class="hero-banner">
-    <video class="banner-img" src="assets/banner.mp4" poster="assets/banner.png"
-           autoplay muted playsinline preload="auto"
-           aria-label="4th Transplant MindaNOW — Bridging the Gaps: From Referral to Recovery. July 6 and 7, 2026, Apo View Hotel, Davao City."></video>
+    <video class="banner-img" poster="assets/banner.png"
+           autoplay muted loop playsinline preload="auto"
+           aria-label="4th Transplant MindaNOW — Bridging the Gaps: From Referral to Recovery. July 6 and 7, 2026, Apo View Hotel, Davao City.">
+      <source src="assets/banner.webm" type="video/webm">
+      <source src="assets/banner.mp4" type="video/mp4">
+    </video>
   </header>
 
   <!-- TEXT HERO (below banner) -->
@@ -440,7 +522,10 @@ footer b{color:var(--gold-bright);font-weight:500}
       <a class="btn-gold" href="#register">Confirm your attendance</a>
     </div>
   </header>
+  </div><!-- /panel 1 -->
 
+  <!-- PANEL 2 · ORGANIZING BODIES -->
+  <div class="panel" data-panel="2">
   <!-- ORGANIZING BODIES -->
   <section class="auspices reveal" aria-label="Organizing bodies">
     <p class="auspices-label">Convened under the auspices of</p>
@@ -466,9 +551,10 @@ footer b{color:var(--gold-bright);font-weight:500}
       <span>Referral <i>·</i> Evaluation <i>·</i> Listing <i>·</i> Donation <i>·</i> Transplant <i>·</i> Recovery <i>·</i> 4th Transplant MindaNOW <i>·</i> Apo View Hotel, Davao City <i>·</i> July 6–7, 2026 <i>·</i> </span>
     </div>
   </div>
+  </div><!-- /panel 2 -->
 
-  <!-- DETAILS -->
-  <section>
+  <!-- PANEL 3 · DETAILS -->
+  <section class="panel" data-panel="3">
     <div class="sect-head reveal">
       <span class="sect-num">№ 01</span>
       <h2>An invitation to <em>every link</em> in the chain</h2>
@@ -492,8 +578,8 @@ footer b{color:var(--gold-bright);font-weight:500}
     </div>
   </section>
 
-  <!-- REGISTRATION -->
-  <section id="register">
+  <!-- PANEL 4 · REGISTRATION -->
+  <section id="register" class="panel" data-panel="4">
     <div class="reg-wrap">
       <div class="sect-head reveal">
         <span class="sect-num">№ 02</span>
@@ -584,10 +670,28 @@ footer b{color:var(--gold-bright);font-weight:500}
   </section>
 </main>
 
-<footer>
-  <span><b>4th Transplant MindaNOW</b> · Bridging the Gaps</span>
-  <span>DOH CHD XI · Southern Philippines Medical Center</span>
-</footer>
+<!-- ===== PANEL 5 · curtain-reveal footer ===== -->
+<div class="curtain" data-panel="5">
+  <footer class="cine">
+    <div class="cine-aurora" aria-hidden="true"></div>
+    <div class="cine-grid" aria-hidden="true"></div>
+    <div class="cine-giant" aria-hidden="true">MindaNOW</div>
+
+    <div class="cine-main">
+      <span class="cine-kicker" data-cine="1">Bridging the Gaps · From Referral to Recovery</span>
+      <h2 class="cine-head" data-cine="2">See you in <em>Davao</em>.</h2>
+      <div class="cine-actions" data-cine="3">
+        <a class="btn-gold" href="#register">Reserve your seat</a>
+        <a class="cine-ghost" href="#top">Back to top ↑</a>
+      </div>
+    </div>
+
+    <div class="cine-bottom" data-cine="4">
+      <span><b>4th Transplant MindaNOW</b> · Bridging the Gaps</span>
+      <span>DOH CHD XI · Southern Philippines Medical Center</span>
+    </div>
+  </footer>
+</div>
 
 <script>
 /* ---- config: Google Form endpoint + field map ---- */
@@ -612,34 +716,56 @@ mq.innerHTML += mq.innerHTML;
 const io = new IntersectionObserver(es => es.forEach(e => {
   if(e.isIntersecting){ e.target.classList.add("in"); io.unobserve(e.target); }
 }), {threshold:.15});
-document.querySelectorAll(".reveal").forEach(el => io.observe(el));
+document.querySelectorAll(".reveal, .panel").forEach(el => io.observe(el));
 
-/* ---- seamless scroll-morph: parallax blobs + growing scale + progress + orn spin ---- */
+/* ---- scroll-driven morph: liquid blob deformation + progress hairline ---- */
 const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const amp = reduceMotion ? 0.45 : 1;          /* gentler pass for reduce-motion, never fully off */
 const bws = [...document.querySelectorAll(".bw")];
 const progBar = document.getElementById("progBar");
-const orn = document.querySelector(".hero-orn");
-let ticking = false;
-function onScroll(){
+const clamp = (v,a,b) => v < a ? a : v > b ? b : v;
+const curtain = document.querySelector(".curtain");
+const giant = document.querySelector(".cine-giant");
+let lastY = window.scrollY, squash = 0, raf = 0;
+function render(){
   const y = window.scrollY;
   const max = document.documentElement.scrollHeight - window.innerHeight;
   const p = max > 0 ? y / max : 0;
   progBar.style.width = (p * 100).toFixed(2) + "%";
-  if(!reduceMotion){
-    bws.forEach(b => {
-      const r = parseFloat(b.dataset.rate);
-      b.style.transform = `translate3d(0, ${(y * r).toFixed(1)}px, 0) scale(${(1 + p * 0.14).toFixed(3)})`;
-    });
-    if(orn && window.innerWidth > 900){
-      orn.style.transform = `translateY(-50%) scale(${(1 + Math.min(p,1) * 0.07).toFixed(3)})`;
-    }
+  const sx = (1 - squash * 0.65).toFixed(3);   /* volume-preserving squash */
+  const sy = (1 + squash).toFixed(3);
+  bws.forEach(b => {
+    const r = parseFloat(b.dataset.rate);
+    b.style.transform =
+      `translate3d(0, ${(y * r).toFixed(1)}px, 0) scale(${(1 + p * 0.14 * amp).toFixed(3)}) scale(${sx},${sy})`;
+  });
+  if(curtain && giant){                          /* parallax the giant word as the curtain is uncovered */
+    const cp = clamp(1 - curtain.getBoundingClientRect().top / window.innerHeight, 0, 1);
+    giant.style.transform = `translateX(-50%) translateY(${(38 - cp*38).toFixed(1)}px) scale(${(0.82 + cp*0.18).toFixed(3)})`;
+    giant.style.opacity = (cp*cp).toFixed(3);
   }
-  ticking = false;
+}
+function relax(){                               /* ease squash back to rest after scrolling stops */
+  squash *= 0.86;
+  render();
+  if(Math.abs(squash) > 0.0008){ raf = requestAnimationFrame(relax); }
+  else { squash = 0; raf = 0; render(); }
 }
 window.addEventListener("scroll", () => {
-  if(!ticking){ requestAnimationFrame(onScroll); ticking = true; }
+  const y = window.scrollY;
+  squash = clamp((y - lastY) * 0.0011 * amp, -0.08, 0.08);   /* scroll velocity -> liquid morph */
+  lastY = y;
+  if(!raf) raf = requestAnimationFrame(relax);
 }, {passive:true});
-onScroll();
+render();
+window.addEventListener("resize", render, {passive:true});
+
+/* ---- curtain-reveal footer: stagger the scene content in when the panel enters ---- */
+const cine = document.querySelector(".cine");
+if(cine && curtain){
+  new IntersectionObserver(es => es.forEach(e => { if(e.isIntersecting) cine.classList.add("in"); }),
+    {threshold:.28}).observe(curtain);
+}
 
 /* ---- robust autoplay nudge for the hero video ---- */
 (() => {
