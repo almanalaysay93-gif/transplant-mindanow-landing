@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content">
 <title>4th Transplant MindaNOW — Bridging the Gaps: From Referral to Recovery</title>
 <meta name="description" content="Official registration — 4th Transplant MindaNOW Conference, July 6–7, 2026, Apo View Hotel, Davao City.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -551,7 +551,10 @@ h2 em{font-style:italic;color:var(--gold-bright)}
   background:var(--gold-grad);background-size:200% 100%;transition:transform .3s,background-position .6s}
 .bot-form button:hover{transform:scale(1.07);background-position:100% 0}
 .bot-form button svg{width:18px;height:18px}
-.bot-panel.kb .bot-chips{display:none}   /* free vertical room while the keyboard is up */
+/* keyboard up: re-anchor to the top so the input clears the on-screen keyboard
+   (works even in in-app webviews that don't resize the viewport) */
+.bot-panel.kb{top:calc(env(safe-area-inset-top,0px) + 12px);bottom:auto!important;max-height:52vh}
+.bot-panel.kb .bot-chips{display:none}   /* free vertical room while typing */
 @media(max-width:560px){
   .bot-panel{right:.6rem;left:.6rem;width:auto;bottom:82px;height:min(72dvh,540px)}
   .bot-fab{width:56px;height:56px;right:.9rem;bottom:.9rem}
@@ -1041,25 +1044,31 @@ form.addEventListener("submit", async ev => {
   fab.addEventListener("click", () => toggle(!panel.classList.contains("open")));
   document.addEventListener("keydown", e => { if(e.key === "Escape" && panel.classList.contains("open")) toggle(false); });
 
-  /* keep the input visible above the on-screen keyboard (mobile) */
+  /* keep the input visible above the on-screen keyboard.
+     in-app webviews (Messenger, etc.) often don't resize the viewport, so we
+     can't rely on visualViewport firing — instead, on focus we top-anchor the
+     panel (CSS .kb) so the input rises above the keyboard. When visualViewport
+     IS available we refine the height to the exact visible area. */
   const vv = window.visualViewport;
-  const kbAdjust = () => {
-    if(!vv) return;
-    const inset = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
-    const up = inset > 60 && panel.classList.contains("open");
-    panel.classList.toggle("kb", up);
-    if(up){
-      panel.style.bottom = (inset + 10) + "px";
-      panel.style.maxHeight = (vv.height - 20) + "px";
-      log.scrollTop = log.scrollHeight;
-    } else {
-      panel.style.bottom = "";
-      panel.style.maxHeight = "";
-    }
+  const onPhone = () => matchMedia("(max-width:560px)").matches;
+  const refine = () => {
+    if(!panel.classList.contains("kb")) return;
+    /* only trust visualViewport if it actually shrank (real keyboard inset);
+       webviews that don't resize keep the CSS 52vh cap instead */
+    if(vv && vv.height < window.innerHeight - 80) panel.style.maxHeight = Math.round(vv.height - 24) + "px";
+    else panel.style.maxHeight = "";
+    log.scrollTop = log.scrollHeight;
   };
-  if(vv){ vv.addEventListener("resize", kbAdjust); vv.addEventListener("scroll", kbAdjust); }
-  botInput.addEventListener("focus", () => setTimeout(kbAdjust, 250));
-  botInput.addEventListener("blur", () => setTimeout(kbAdjust, 100));
+  botInput.addEventListener("focus", () => {
+    if(!onPhone()) return;
+    panel.classList.add("kb");
+    setTimeout(refine, 280);
+  });
+  botInput.addEventListener("blur", () => {
+    panel.classList.remove("kb");
+    panel.style.maxHeight = "";
+  });
+  if(vv) vv.addEventListener("resize", refine);
 
   botForm.addEventListener("submit", e => {
     e.preventDefault();
