@@ -141,6 +141,13 @@ nav{
 }
 .nav-cta:hover{background-position:100% 0;transform:translateY(-2px)}
 
+/* ====== scroll-snap pages ====== */
+html{scroll-snap-type:y proximity}
+.snap{min-height:100svh;scroll-snap-align:start;display:flex;flex-direction:column;justify-content:center}
+.hero-banner{scroll-snap-align:start}
+@media (prefers-reduced-motion:reduce){html{scroll-snap-type:none}}
+@media (max-width:680px){.snap{min-height:auto}html{scroll-snap-type:none}}
+
 /* ====== flush banner header ====== */
 .hero-banner{width:100%;line-height:0;background:var(--navy-deep)}
 .banner-img{display:block;width:100%;height:auto;margin:0}
@@ -409,7 +416,7 @@ footer b{color:var(--gold-bright);font-weight:500}
   </header>
 
   <!-- TEXT HERO (below banner) -->
-  <header class="hero">
+  <header class="hero snap">
     <span class="kicker">Davao City · July 6, 2026</span>
     <h1>
       <span class="l1">Standardizing referral pathways</span>
@@ -440,7 +447,7 @@ footer b{color:var(--gold-bright);font-weight:500}
   </header>
 
   <!-- ORGANIZING BODIES -->
-  <section class="auspices reveal" aria-label="Organizing bodies">
+  <section class="auspices reveal snap" aria-label="Organizing bodies">
     <p class="auspices-label">Convened under the auspices of</p>
     <div class="crest-row">
       <figure class="crest">
@@ -470,7 +477,7 @@ footer b{color:var(--gold-bright);font-weight:500}
   </div>
 
   <!-- DETAILS -->
-  <section>
+  <section class="snap">
     <div class="sect-head reveal">
       <span class="sect-num">№ 01</span>
       <h2>An invitation to <em>every link</em> in the chain</h2>
@@ -495,7 +502,7 @@ footer b{color:var(--gold-bright);font-weight:500}
   </section>
 
   <!-- REGISTRATION -->
-  <section id="register">
+  <section id="register" class="snap">
     <div class="reg-wrap">
       <div class="sect-head reveal">
         <span class="sect-num">№ 02</span>
@@ -613,8 +620,8 @@ mq.innerHTML += mq.innerHTML;
 
 /* ---- scroll reveal ---- */
 const io = new IntersectionObserver(es => es.forEach(e => {
-  if(e.isIntersecting){ e.target.classList.add("in"); io.unobserve(e.target); }
-}), {threshold:.15});
+  e.target.classList.toggle("in", e.isIntersecting);   // re-fire reveal each time a page scrolls in
+}), {threshold:.18});
 document.querySelectorAll(".reveal").forEach(el => io.observe(el));
 
 /* ---- seamless scroll-morph: parallax blobs + growing scale + progress + orn spin ---- */
